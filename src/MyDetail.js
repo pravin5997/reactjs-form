@@ -4,18 +4,22 @@ import { geocodeByAddress, getLatLng } from 'react-places-autocomplete';
 import { Row, Col, Form, Button } from 'react-bootstrap';
 import DatePicker from './DateOfBirth';
 import bsCustomFileInput from 'bs-custom-file-input';
-import { Textbox } from 'react-inputs-validation';
-import { Radiobox } from 'react-inputs-validation';
+// import { Textbox } from 'react-inputs-validation';
+// import { Radiobox } from 'react-inputs-validation';
 import MdbForm from './MdbForm';
 import './formcss.css';
+// import $ from 'jquery';
 
-const a = {firstName:"firstName",lastName:"lastName",number:"number"}
+const emailRegex = /^[a-zA-Z0-9.]+@+[a-zA-Z0-9]+.+[A-z]/;
+const a = { firstName: 'firstName', lastName: 'lastName', number: 'number' };
 export default class MyDetail extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
 			address: '',
-			myaddress:"",
+			myPlace:"",
+			addressError:'',
+			myaddress: '',
 			myData: [],
 			myCity: [],
 			myState: [],
@@ -26,32 +30,35 @@ export default class MyDetail extends Component {
 			LastName: '',
 			MobileNo: '',
 			EmailId: '',
-			State:"",
-			ZipCode:"",
+			State: '',
+			ZipCode: '',
 			number: '',
-			myBirthDate:"",
+			myBirthDate: '',
 			textInput: '',
-			name: '',
-			nameError:"",
-			mobile:"",
-			mobileError:""
-			
-			
-
+			email: '',
+			emailError: '',
+			mobile: '',
+			mobileError: '',
+			firstName: '',
+			firstNameError: '',
+			lastName: '',
+			lastNameError: '',
+			someName: '',
+			date:"",
+			dateError:""
 		};
 	}
 	handleClickForm = (event) => {
-		this.valid()
+		this.valid();
 		this.setState({
 			myaddress: this.state.address,
-			MobileNo: document.getElementById("number").value,
-			FirstName:document.getElementById("firstName").value,
-			LastName:document.getElementById("lastName").value,
-			EmailId:document.getElementById("email").value,
-			State:document.getElementById("state").value,
-			ZipCode:document.getElementById("zipcode").value,
-			myBirthDate:document.getElementById("date").value
-
+			MobileNo: document.getElementById('mobile').value,
+			FirstName: document.getElementById('firstName').value,
+			LastName: document.getElementById('lastName').value,
+			EmailId: document.getElementById('email').value,
+			State: document.getElementById('state').value,
+			ZipCode: document.getElementById('zipcode').value,
+			myBirthDate: document.getElementById('date').value
 		});
 	};
 	handleFileChange = (event) => {
@@ -62,12 +69,16 @@ export default class MyDetail extends Component {
 
 	handleDateChange = (birthDate) => this.setState({ birthDate });
 	handleChange = (address) => {
-		this.setState({ address });
+		
+		this.setState({ address});
 	};
 
-	handleSelect = (address) => {
+	handleSelect = (address,event) => {
+		
 		geocodeByAddress(address).then((results) => {
-			this.setState({ myData: results[0].formatted_address }, () => {
+		
+			this.setState({ address,
+							myData: results[0].formatted_address }, () => {
 				this.setState({
 					myCity: this.state.myData.split(','),
 					myState: this.state.myData.split(',')[1].split(' ')
@@ -82,32 +93,79 @@ export default class MyDetail extends Component {
 		this.setState({ mySrcImage: myImageSrc });
 	};
 	onChangeErroHandle = (event) => {
-		
-		this.setState({ [event.target.name]:event.target.value});
+		this.setState({ [event.target.name]: event.target.value });
 	};
-	onChangetextBox = (number,e) => {
-		this.setState({
-			number
-			
-		});
-	};
-	valid() {   
-		if (!this.state.name.includes('@')) {
+	valid() {
+		if (this.state.firstName.length < 1) {
 			this.setState({
-				nameError: 'please @ is requared',
+				firstNameError: 'This field is required'
+			});
+		} else {
+			this.setState({
+				firstNameError: null
 			});
 		}
-		// if(this.state.mobile)
+		if (this.state.lastName.length < 1) {
+			this.setState({
+				lastNameError: 'This field is required'
+			});
+		} else {
+			this.setState({
+				lastNameError: null
+			});
+		}
+		if (this.state.mobile.length === 0) {
+			this.setState({
+				mobileError: 'This field is required'
+			});
+		} else {
+			this.setState({
+				mobileError: 'This field is required'
+			});
+		}
+		if (this.state.email.length === 0) {
+			this.setState({
+				emailError: 'This fiel is required'
+			});
+		} else if (!emailRegex.test(this.state.email)) {
+			this.setState({
+				emailError: 'Invalid Email!'
+			});
+		} else {
+			this.setState({
+				emailError: null
+			});
+		}
+		if (this.state.mobile.length === 0) {
+			this.setState({
+				mobileError: 'This fiel is required'
+			});
+		} else {
+			this.setState({
+				mobileError: null
+			});
+		}
+		if (this.state.address.length < 1) {
+			this.setState({
+				addressError: 'This field is required'
+			});
+		} else {
+			this.setState({
+				addressError: null
+			});
+		}
+
 	}
-	myClickHandler = () =>{
-		this.valid()
-	}
+	myClickHandler = () => {
+		this.valid();
+	};
 	render() {
+		console.log(this.state.myPlace)
 		return (
 			<div className="container register">
 				<div className="row">
 					<div className="col-md-3 register-left">
-						<img src="https://image.ibb.co/n7oTvU/logo_white.png" alt=""/>
+						<img src="https://image.ibb.co/n7oTvU/logo_white.png" alt="" />
 						<h3>Welcome</h3>
 						<h3>Pravin</h3>
 					</div>
@@ -120,92 +178,127 @@ export default class MyDetail extends Component {
 								aria-labelledby="home-tab"
 							>
 								<h3 className="register-heading">Registration Form</h3>
-								<div className="row register-form">
+								<div className="row register-form" autocomplete="off">
 									<div className="col-md-6">
 										<div className="form-group">
-                                            <label>FirstName</label>
-											<MdbForm
-												myDataInput="firstName"
-												mytype="text"
-												inputLenth={15}
-												changeEventHandle={this.onChangetextBox}
-											/>
-											<p>{this.state.FirstName}</p>
-										</div>
-										<div className="form-group">
-                                        <label>LastName</label>
-											<MdbForm
-												myDataInput="lastName"
-												mytype="text"
-												inputLenth={15}
-												changeEventHandle={this.onChangetextBox}
-											/>
-											<p>{this.state.LastName}</p>
-										</div>
-										<div className="form-group">
-                                        <label>Mobile No.</label>
-											<MdbForm
-												myDataInput="number"
-												mytype="number"
-												inputLenth={13}
-												changeEventHandle={this.onChangetextBox}
-											/>
-											<p>{this.state.MobileNo}</p>
-										</div>
-										{/* <div className="form-group">
-                                        <label>Email Id</label>
-											<input
-												type="email"
-												className="form-control"
-												placeholder="Your Email *"
-												id="email"
-											/>
-											<p>{this.state.EmailId}</p>
-										</div> */}
-										<div className="form-group">
-                                        <label>Email Id</label>
+											<label>
+												First Name<span style={{ color: 'red' }}>*</span>
+											</label>
 											<input
 												className="form-control"
 												type="text"
-												name="name"
+												name="firstName"
+												id="firstName"
+												maxLength={15}
+												placeholder="Your First Name *"
+												onChange={this.onChangeErroHandle}
+												required
+											/>
+											<p>{this.state.FirstName}</p>
+											<p style={{ color: 'red', fontSize: '12px' }}>
+												{this.state.firstNameError}
+											</p>
+										</div>
+										<div className="form-group">
+											<label>
+												Last Name<span style={{ color: 'red' }}>*</span>
+											</label>
+											<input
+												className="form-control"
+												type="text"
+												name="lastName"
+												id="lastName"
+												maxLength={15}
+												placeholder="Your Last Name *"
+												onChange={this.onChangeErroHandle}
+												required
+											/>
+											<p>{this.state.LastName}</p>
+											<p style={{ color: 'red', fontSize: '12px' }}>
+												{this.state.lastNameError}
+											</p>
+										</div>
+										<div className="form-group">
+											<label>
+												Mobile No.<span style={{ color: 'red' }}>*</span>
+											</label>
+											<input
+												type="text"
+												className="form-control"
+												id="mobile"
+												onChange={(event) => {
+													if (isNaN(Number(event.target.value))) {
+														return;
+													} else {
+														this.setState({ mobile: event.target.value });
+													}
+												}}
+												maxLength={13}
+												placeholder="Enter Mobile number*"
+												value={this.state.mobile}
+											/>
+											<p>{this.state.MobileNo}</p>
+											<p style={{ color: 'red', fontSize: '12px' }}>
+												{this.state.mobileError}
+											</p>
+										</div>
+										<div className="form-group">
+											<label>
+												Email Id<span style={{ color: 'red' }}>*</span>
+											</label>
+											<input
+												className="form-control"
+												type="text"
+												name="email"
 												id="email"
 												placeholder="Your Email *"
 												onChange={this.onChangeErroHandle}
+												required
 											/>
 											<p>{this.state.EmailId}</p>
-											<p style={{color:"red",fontSize:"12px"}}>{this.state.nameError}</p>
+											<p style={{ color: 'red', fontSize: '12px' }}>
+												{this.state.emailError}
+											</p>
 										</div>
 									</div>
-									
+
 									<div className="col-md-6">
-                                    <label>City</label>
+										<label>
+											City<span style={{ color: 'red' }}>*</span>
+										</label>
 										<div className="form-group">
 											<LocationSearchInput
 												handleplace={this.handleChange}
 												selectHandle={this.handleSelect}
 												myValue={this.state.address}
 												required
+												style={{ height: '500px' }}
 											/>
 											<p>{this.state.myaddress}</p>
+											<p style={{ color: 'red', fontSize: '12px' }}>
+												{this.state.addressError}
+											</p>
 										</div>
 										<div className="form-group">
-                                        <label>State</label>
+											<label>
+												State
+											</label>
 											<input
 												className="form-control"
 												type="text"
 												id="state"
 												value={this.state.myState[1]}
-												placeholder="Enter State"
+												placeholder="Enter State*"
 												readOnly
 											/>
 											<p>{this.state.State}</p>
 										</div>
 										{this.state.myCity.length === 3 ? (
 											<div className="form-group">
-                                                <label>Zip Code</label>
+												<label>Zip Code</label>
 												<input
 													value={this.state.myState[2]}
-													placeholder="Zip Code"
+													placeholder="Zip Code*"
 													id="zipcode"
 													type="text"
 													className="form-control"
@@ -215,7 +308,7 @@ export default class MyDetail extends Component {
 											</div>
 										) : (
 											<div className="form-group">
-                                                <label>Zip Code</label>
+												<label>Zip Code</label>
 												<input
 													value=""
 													className="form-control"
@@ -229,7 +322,9 @@ export default class MyDetail extends Component {
 										)}
 										<div className="form-group"></div>
 										<div className="form-group">
-                                        <label>Date Of Birth</label>
+											<label>
+												Date Of Birth<span style={{ color: 'red' }}>*</span>
+											</label>
 											<DatePicker
 												onChangeEvent={this.handleDateChange}
 												DateValue={this.state.birthDate}
@@ -240,7 +335,7 @@ export default class MyDetail extends Component {
 
 									<div className="col-md-12">
 										<div className="form-group">
-                                        
+											<label>upload image<span style={{ color: 'red' }}>*</span></label>
 											<div style={{ display: 'flex', alignItems: 'center' }}>
 												<div className="custom-file">
 													<input
@@ -255,7 +350,7 @@ export default class MyDetail extends Component {
 														className="custom-file-label"
 														htmlFor="inputGroupFile01"
 													>
-														Choose file
+														Choose file*
 													</label>
 												</div>
 												{this.state.mySrcImage !== '' ? (
@@ -275,7 +370,9 @@ export default class MyDetail extends Component {
 									</div>
 									<div className="col-md-2">
 										<div className="form-group">
-											<Form.Label as="legend">Gender </Form.Label>
+											<lable>
+												Gender
+											</lable>
 										</div>
 									</div>
 									<div className="col-md-10">
@@ -287,8 +384,9 @@ export default class MyDetail extends Component {
 														name="gender"
 														value="male"
 														checked
+														
 													/>
-													<span> Male </span>
+													<span style={{marginRight:"15px"}}> Male </span>
 												</label>
 												<label className="radio inline">
 													<input type="radio" name="gender" value="female" />
@@ -299,7 +397,7 @@ export default class MyDetail extends Component {
 									</div>
 									<div className="col-md-2">
 										<div className="form-group">
-											<label className="lable">Hobby </label>
+											<label className="lable">Hobby</label>
 										</div>
 									</div>
 									<div className="col-md-10">
@@ -345,8 +443,9 @@ export default class MyDetail extends Component {
 										type="button"
 										className="btnRegister"
 										onClick={this.handleClickForm}
-									>Register</Button>
-									{/* <Button onClick={this.myClickHandler}>Click</Button> */}
+									>
+										Register
+									</Button>
 								</div>
 							</div>
 						</div>

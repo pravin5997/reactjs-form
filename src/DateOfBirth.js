@@ -19,6 +19,7 @@ export default class DatePicker extends React.Component {
           value={this.state.selectedDate}
           className="my-custom-datepicker-component"
           id="date"
+          name="date"
         />
       </div>
     );
