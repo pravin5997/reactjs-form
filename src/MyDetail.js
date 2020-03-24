@@ -136,7 +136,7 @@ export default class MyDetail extends Component {
 				emailError: null
 			});
 		}
-		if (this.state.mobile.length === 0) {
+		if (this.state.mobile.length < 0) {
 			this.setState({
 				mobileError: 'This fiel is required'
 			});
